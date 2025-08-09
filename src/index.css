@@ -11,3 +11,41 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* 高亮显示设置 */
+/* src/index.css 或 App.css */
+.highlight {
+  background-color: #ffeb3b !important;
+  border-radius: 50%;
+  color: #000 !important;
+  font-weight: bold;
+}
+
+.react-calendar__tile {
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.react-calendar__tile:hover {
+  background-color: #e0e0e0;
+}
+
+/* 错误边界样式 */
+/* src/index.css */
+.error-fallback {
+  padding: 20px;
+  border: 2px solid #ff6b6b;
+  background-color: #ffe8e8;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.error-fallback button {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}

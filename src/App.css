@@ -36,3 +36,446 @@
     transform: rotate(360deg);
   }
 }
+/* 基本布局样式设置 */
+/* 在App.css中添加 */
+.task-management-view {
+  padding: 20px;
+}
+
+.back-button {
+  background: #3f51b5;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.view-container {
+  display: flex;
+  gap: 20px;
+}
+
+.time-axis-section {
+  flex: 1;
+}
+
+.quadrant-section {
+  flex: 1;
+}
+
+
+/* src/App.css */
+.quadrant-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 15px;
+  height: 500px;
+}
+
+.quadrant {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #f9f9f9;
+}
+
+.quadrant h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.tasks-container {
+  min-height: 150px;
+}
+
+.task-item {
+  background: white;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.task-time {
+  font-size: 0.8em;
+  color: #666;
+}
+
+.time-axis {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.hour-block {
+  position: relative;
+  height: 60px;
+  border-bottom: 1px solid #eee;
+  padding: 5px 10px;
+}
+
+.time-block {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(33, 150, 243, 0.1);
+  border: 1px solid #2196f3;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.create-task-btn {
+  background: #2196f3;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+/* src/App.css */
+.task-item {
+  /* 原有样式 */
+  transition: all 0.2s ease;
+}
+
+.quadrant-grid {
+  min-height: 300px;
+  transition: background-color 0.3s ease;
+}
+
+.quadrant {
+  position: relative;
+}
+
+.quadrant::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  pointer-events: none;
+  transition: border-color 0.3s ease;
+}
+
+.quadrant-grid.drag-over .quadrant::after {
+  border-color: #2196f3;
+}
+
+.quadrant.accepting-drop::after {
+  border-color: #4caf50 !important;
+}
+
+/* src/App.css */
+.tile-content {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+}
+
+.task-dot {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #f44336;
+}
+
+.highlight .task-dot {
+  background-color: white;
+}
+
+/* 完整CSS */
+
+/* src/App.css */
+.App {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.back-button {
+  background: #3f51b5;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.task-management-view {
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.view-container {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.time-axis-section, .quadrant-section {
+  flex: 1;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.time-range-preview {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #e3f2fd;
+  border-radius: 4px;
+}
+
+.create-task-btn {
+  background: #2196f3;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.time-axis {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  height: 600px;
+  position: relative;
+}
+
+.hour-block {
+  position: relative;
+  height: 60px;
+  border-bottom: 1px solid #eee;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.hour-block.has-task {
+  background-color: rgba(255, 0, 0, 0.05);
+}
+
+.hour-label {
+  font-size: 12px;
+  color: #666;
+}
+
+.task-block {
+  position: absolute;
+  top: 5px;
+  left: 50px;
+  right: 5px;
+  background: rgba(33, 150, 243, 0.15);
+  border: 1px solid #2196f3;
+  border-radius: 4px;
+  padding: 5px;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.task-content {
+  font-weight: bold;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-time {
+  font-size: 12px;
+  color: #555;
+}
+
+.time-block {
+  position: absolute;
+  top: 0;
+  left: 50px;
+  right: 5px;
+  background: rgba(76, 175, 80, 0.2);
+  border: 1px dashed #4caf50;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.time-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.quadrant-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 15px;
+  height: 500px;
+}
+
+.quadrant {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.quadrant h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.tasks-container {
+  min-height: 150px;
+}
+
+.task-item {
+  background: white;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  cursor: move;
+  transition: all 0.2s;
+}
+
+.task-item:hover {
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
+}
+
+/* 象限特定样式 */
+.quadrant-important-urgent {
+  border-top: 4px solid #f44336;
+}
+
+.quadrant-important-noturgent {
+  border-top: 4px solid #4caf50;
+}
+
+.quadrant-notimportant-urgent {
+  border-top: 4px solid #ff9800;
+}
+
+.quadrant-notimportant-noturgent {
+  border-top: 4px solid #9e9e9e;
+}
+
+/* src/App.css */
+/* 添加拖拽反馈样式 */
+.drop-target {
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+}
+
+.task-item {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.task-item.dragging {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transform: scale(1.02);
+}
+
+.task-item:hover {
+  background-color: #f0f8ff;
+}
+
+/* 任务编辑器样式增强 */
+.task-editor {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  z-index: 1000;
+  width: 90%;
+  max-width: 500px;
+}
+
+.task-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+}
+
+/* 四象限视觉区分 */
+.quadrant-important-urgent {
+  border-top: 4px solid #ff5252;
+}
+
+.quadrant-important-noturgent {
+  border-top: 4px solid #4caf50;
+}
+
+.quadrant-notimportant-urgent {
+  border-top: 4px solid #ff9800;
+}
+
+.quadrant-notimportant-noturgent {
+  border-top: 4px solid #9e9e9e;
+}
+
+/* 时间轴任务块样式 */
+.task-block {
+  position: absolute;
+  top: 5px;
+  left: 50px;
+  right: 5px;
+  background: rgba(33, 150, 243, 0.15);
+  border: 1px solid #2196f3;
+  border-radius: 4px;
+  padding: 5px;
+  z-index: 2;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.task-block:hover {
+  background: rgba(33, 150, 243, 0.25);
+  border: 1px solid #0d8bf2;
+}
