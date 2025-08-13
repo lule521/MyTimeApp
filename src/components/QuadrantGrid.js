@@ -1,80 +1,94 @@
-// 四象限网格
 // src/components/QuadrantGrid.js
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 const QUADRANTS = [
-  { id: 'important-urgent', title: '重要紧急' },
-  { id: 'important-noturgent', title: '重要不紧急' },
-  { id: 'notimportant-urgent', title: '不重要紧急' },
-  { id: 'notimportant-noturgent', title: '不重要不紧急' }
+  { id: 'important-urgent', title: '重要 & 紧急' },
+  { id: 'important-noturgent', title: '重要 & 不紧急' },
+  { id: 'notimportant-urgent', title: '不重要 & 紧急' },
+  { id: 'notimportant-noturgent', title: '不重要 & 不紧急' },
 ];
 
-export default function QuadrantGrid({ tasks, onTaskMove, onTaskClick }) {
+export default function QuadrantGrid({ tasks = [], onTaskMove, onTaskClick, onToggleComplete }) {
   return (
-    <div className="quadrant-grid">
-      {QUADRANTS.map(quadrant => (
-        <div 
-          key={quadrant.id} 
-          className={`quadrant quadrant-${quadrant.id}`}
-        >
-          <h4>{quadrant.title}</h4>
-          <div className="tasks-container">
-            {tasks
-              .filter(task => task.quadrant === quadrant.id)
-              .map(task => (
-                <TaskItem 
-                  key={task.id} 
-                  task={task} 
-                  onMove={onTaskMove}
-                  onClick={onTaskClick}
-                />
-              ))}
-          </div>
-        </div>
+    <div className="quadrant-container">
+      {QUADRANTS.map((q) => (
+        <QuadrantColumn
+          key={q.id}
+          quadrant={q}
+          tasks={tasks.filter((t) => t.quadrant === q.id)}
+          onTaskMove={onTaskMove}
+          onTaskClick={onTaskClick}
+          onToggleComplete={onToggleComplete}
+        />
       ))}
     </div>
   );
 }
 
-function TaskItem({ task, onMove, onClick }) {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'TASK',
-    item: { id: task.id, quadrant: task.quadrant },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }));
-
-  // 为每个象限创建单独的放置目标
-  const [, drop] = useDrop(() => ({
+function QuadrantColumn({ quadrant, tasks, onTaskMove, onTaskClick, onToggleComplete }) {
+  const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: 'TASK',
     drop: (item) => {
-      if (onMove && item.id !== task.id) {
-        onMove(item.id, task.quadrant);
+      // 确保 item.id 存在且象限不同时才移动
+      if (item.id && item.quadrant !== quadrant.id) {
+        onTaskMove(item.id, quadrant.id);
       }
     },
     collect: (monitor) => ({
-      isOver: !!monitor.isOver()
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop()
     })
-  }));
+  }), [quadrant.id, onTaskMove]);
 
   return (
-    <div 
-      ref={drag}
-      className="task-item"
-      style={{ 
-        opacity: isDragging ? 0.5 : 1,
-        cursor: 'move'
-      }}
-      onClick={() => onClick(task)}
-    >
-      <div ref={drop} className="drop-target">
-        {task.content}
-        <div className="task-time">
-          {task.startHour}:00 - {task.startHour + task.duration}:00
-        </div>
+    <div ref={drop} className={`quadrant ${isOver && canDrop ? 'accepting-drop' : ''}`}>
+      <h4>{quadrant.title}</h4>
+      <div className="tasks-container">
+        {tasks.map((task) => (
+          <TaskCard key={task.id} task={task} onClick={onTaskClick} onToggleComplete={onToggleComplete} />
+        ))}
+        {tasks.length === 0 && <div style={{textAlign: 'center', color: '#aaa', marginTop: '20px'}}>暂无任务</div>}
       </div>
+    </div>
+  );
+}
+
+function TaskCard({ task, onClick, onToggleComplete }) {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: 'TASK',
+    item: { id: task.id, quadrant: task.quadrant },
+    collect: (monitor) => ({ isDragging: !!monitor.isDragging() })
+  }), [task.id, task.quadrant]);
+
+  const taskItemClasses = [
+    'task-item',
+    task.isCompleted ? 'completed' : '',
+    isDragging ? 'dragging' : ''
+  ].join(' ').trim();
+
+  return (
+    <div
+      ref={drag}
+      className={taskItemClasses}
+      onClick={() => onClick && onClick(task)}
+    >
+        <input
+          type="checkbox"
+          checked={!!task.isCompleted}
+          onClick={(e) => {
+            e.stopPropagation(); // 防止触发 onClick 打开编辑器
+            onToggleComplete && onToggleComplete(task.id);
+          }}
+          readOnly
+          style={{ marginRight: '8px' }}
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="title">{task.content}</div>
+          <div className="meta">
+            {task.startHour}:00 - {task.startHour + task.duration}:00
+          </div>
+        </div>
     </div>
   );
 }

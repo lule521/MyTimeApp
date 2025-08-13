@@ -1,119 +1,96 @@
 // src/components/TaskManagement.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import TimeAxis from './TimeAxis';
 import QuadrantGrid from './QuadrantGrid';
 import TaskEditor from './TaskEditor';
 import { format } from 'date-fns';
 
-export default function TaskManagement({ 
-  date, 
-  tasks, 
-  allTasks,
-  onCreateTask, 
+export default function TaskManagement({
+  date,
+  tasks,
+  onCreateTask,
   onUpdateTask,
-  onTaskMove, 
+  onTaskMove,
   onDeleteTask,
-  onBack 
+  onToggleComplete,
+  onBack
 }) {
-  const [editingTask, setEditingTask] = useState(null);
-  const [selectedTimeRange, setSelectedTimeRange] = useState(null);
-  const [newTaskData, setNewTaskData] = useState(null);
+  const [editingTask, setEditingTask] = useState(null); // null | object
 
-  // 修复：当有新任务数据时自动打开编辑器
-  useEffect(() => {
-    if (newTaskData) {
-      setEditingTask(newTaskData);
-    }
-  }, [newTaskData]);
+  // 统一的编辑器入口，可以是空对象{}（新建），或完整任务对象（编辑）
+  const handleOpenEditor = (task = {}) => {
+    // 如果是新建任务，则传入一个空对象
+    // 如果是编辑，则传入完整的 task 对象
+    // 如果是从时间轴创建，则传入一个包含 startHour 和 duration 的部分对象
+    setEditingTask(task);
+  };
 
-  // 打开任务编辑器
-  const openTaskEditor = (task = null) => {
-    setEditingTask(task || {
-      id: Date.now(),
-      content: '',
-      date: format(date, 'yyyy-MM-dd'),
-      startHour: selectedTimeRange?.startHour || 9,
-      duration: selectedTimeRange?.duration || 1,
-      quadrant: 'important-urgent'
+  const handleCloseEditor = () => {
+    setEditingTask(null);
+  };
+
+  // 从 24 小时 TimeAxis 拖选时间段后触发
+  const handleCreateTaskFromTime = (timeRange) => {
+    // 准备一个包含默认时间的新任务对象，然后打开编辑器
+    handleOpenEditor({
+      startHour: timeRange.startHour,
+      duration: timeRange.duration
     });
   };
 
-  // 保存任务
-  const handleSaveTask = (task) => {
-    if (allTasks.some(t => t.id === task.id)) {
-      onUpdateTask(task);
+  const handleSaveTask = (taskData) => {
+    // editingTask.id 存在，说明是编辑模式
+    if (taskData.id) {
+      onUpdateTask(taskData);
     } else {
-      onCreateTask(task);
+      // id 不存在，说明是创建新任务
+      onCreateTask(taskData);
     }
-    setEditingTask(null);
-    setNewTaskData(null);
-    setSelectedTimeRange(null);
+    handleCloseEditor();
   };
 
-  // 处理创建新任务
-  const handleCreateNewTask = () => {
-    if (!selectedTimeRange) return;
-    
-    const newTask = {
-      id: Date.now(),
-      content: '新任务',
-      date: format(date, 'yyyy-MM-dd'),
-      ...selectedTimeRange,
-      quadrant: 'important-urgent'
-    };
-    
-    setNewTaskData(newTask);
+  const handleDeleteAndClose = (taskId) => {
+    onDeleteTask(taskId);
+    handleCloseEditor();
   };
 
   return (
-    <div className="task-management-view">
-      <button onClick={onBack} className="back-button">
-        &larr; 返回日历
-      </button>
-      
-      <h2>{format(date, 'yyyy年MM月dd日')} 任务管理</h2>
-      
-      <div className="view-container">
-        <div className="time-axis-section">
-          <h3>24小时时间轴</h3>
-          <TimeAxis 
+    <div className="task-management">
+      <div className="toolbar">
+        <button onClick={onBack}>返回日历</button>
+        <h3>{format(date, 'yyyy-MM-dd')}</h3>
+        <button onClick={() => handleOpenEditor({})}>+ 创建新任务</button>
+      </div>
+
+      <div className="task-layout">
+        {/* 左边 24 小时视图 */}
+        <div className="time-axis-container">
+          <TimeAxis
             tasks={tasks}
-            onSelectTime={setSelectedTimeRange}
-            onTaskClick={openTaskEditor}
+            onTaskClick={handleOpenEditor} // 点击任务块也能编辑
+            onToggleComplete={onToggleComplete}
+            onCreateRange={handleCreateTaskFromTime} // 正确传递创建回调
           />
-          
-          {selectedTimeRange && !editingTask && (
-            <div className="time-range-preview">
-              <p>已选择时间段: {selectedTimeRange.startHour}:00 - {selectedTimeRange.startHour + selectedTimeRange.duration}:00</p>
-              <button 
-                className="create-task-btn"
-                onClick={handleCreateNewTask}
-              >
-                创建任务
-              </button>
-            </div>
-          )}
         </div>
-        
-        <div className="quadrant-section">
-          <h3>四象限任务管理</h3>
-          <QuadrantGrid 
-            tasks={tasks} 
+
+        {/* 右边 四象限视图 */}
+        <div className="quadrant-container">
+          <QuadrantGrid
+            tasks={tasks}
             onTaskMove={onTaskMove}
-            onTaskClick={openTaskEditor}
+            onTaskClick={handleOpenEditor} // 修复：传递点击回调
+            onToggleComplete={onToggleComplete}
           />
         </div>
       </div>
-      
+
+      {/* 任务编辑弹窗 */}
       {editingTask && (
-        <TaskEditor 
-          task={editingTask} 
-          onSave={handleSaveTask} 
-          onDelete={onDeleteTask}
-          onCancel={() => {
-            setEditingTask(null);
-            setNewTaskData(null);
-          }}
+        <TaskEditor
+          task={editingTask}
+          onSave={handleSaveTask}
+          onCancel={handleCloseEditor}
+          onDelete={handleDeleteAndClose}
         />
       )}
     </div>

@@ -1,4 +1,3 @@
-// 任务编辑弹窗
 // src/components/TaskEditor.js
 import React, { useState } from 'react';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Select, MenuItem } from '@mui/material';
@@ -11,14 +10,16 @@ const QUADRANTS = [
 ];
 
 export default function TaskEditor({ task, onSave, onDelete, onCancel }) {
+  // 即使 task 是部分对象（如来自时间轴选择），也能正确初始化
   const [content, setContent] = useState(task.content || '');
-  const [startHour, setStartHour] = useState(task.startHour || 9);
+  const [startHour, setStartHour] = useState(task.startHour !== undefined ? task.startHour : 9);
   const [duration, setDuration] = useState(task.duration || 1);
   const [quadrant, setQuadrant] = useState(task.quadrant || 'important-urgent');
   
   const handleSubmit = () => {
+    // onSave 回调中包含所有信息，包括 id（如果是编辑的话）
     onSave({
-      ...task,
+      ...task, // 包含 id 等已有属性
       content,
       startHour,
       duration,
@@ -43,19 +44,19 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel }) {
         
         <div style={{ display: 'flex', gap: '15px', margin: '15px 0' }}>
           <TextField
-            label="开始时间"
+            label="开始时间 (0-23)"
             type="number"
             value={startHour}
-            onChange={(e) => setStartHour(parseInt(e.target.value) || 0)}
+            onChange={(e) => setStartHour(parseInt(e.target.value, 10) || 0)}
             inputProps={{ min: 0, max: 23 }}
             fullWidth
           />
           
           <TextField
-            label="持续时间(小时)"
+            label="持续时间 (小时)"
             type="number"
             value={duration}
-            onChange={(e) => setDuration(parseInt(e.target.value) || 1)}
+            onChange={(e) => setDuration(parseInt(e.target.value, 10) || 1)}
             inputProps={{ min: 1, max: 24 }}
             fullWidth
           />
@@ -66,7 +67,11 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel }) {
             value={quadrant}
             onChange={(e) => setQuadrant(e.target.value)}
             fullWidth
+            displayEmpty
           >
+            <MenuItem disabled value="">
+              <em>选择象限</em>
+            </MenuItem>
             {QUADRANTS.map(q => (
               <MenuItem key={q.id} value={q.id}>{q.title}</MenuItem>
             ))}
@@ -80,7 +85,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel }) {
           </Button>
         )}
         <Button onClick={onCancel}>取消</Button>
-        <Button onClick={handleSubmit} color="primary">
+        <Button onClick={handleSubmit} color="primary" variant="contained">
           保存
         </Button>
       </DialogActions>

@@ -1,108 +1,104 @@
-// import React from 'react';
-// import CalendarView from './components/CalendarView';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <h1>时间管理应用</h1>
-//       <CalendarView />
-//     </div>
-//   );
-// }
-// src/App.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CalendarView from './components/CalendarView';
 import TaskManagement from './components/TaskManagement';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { format } from 'date-fns';
+import './App.css'; // <--- 添加这一行来导入CSS样式
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showTaskView, setShowTaskView] = useState(false);
   const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem('timeAppTasks');
-    return savedTasks ? JSON.parse(savedTasks) : [];
+    const saved = localStorage.getItem('timeAppTasks');
+    return saved ? JSON.parse(saved) : [];
   });
-  
-  // 保存任务到本地存储
+
+  const clickTimeout = useRef(null);
+  const lastClickedDate = useRef(null);
+
+  // 点击/双击日期逻辑
+  const handleDateInteraction = (date) => {
+    clearTimeout(clickTimeout.current);
+    const lastStr = lastClickedDate.current
+      ? format(lastClickedDate.current, 'yyyy-MM-dd')
+      : null;
+    const nowStr = format(date, 'yyyy-MM-dd');
+
+    if (lastStr === nowStr) {
+      setCurrentDate(date);
+      setShowTaskView(true);
+      lastClickedDate.current = null;
+    } else {
+      lastClickedDate.current = date;
+      clickTimeout.current = setTimeout(() => {
+        setCurrentDate(date);
+        lastClickedDate.current = null;
+      }, 300);
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem('timeAppTasks', JSON.stringify(tasks));
   }, [tasks]);
 
-  // 处理日期单击
-  const handleDateClick = (date) => {
-    setCurrentDate(date);
-  };
-  
-  // 处理日期双击
-  const handleDoubleClick = (date) => {
-    setCurrentDate(date);
-    setShowTaskView(true);
-  };
-
-  // 创建新任务 - 修复：直接打开编辑器
-  const handleCreateTask = (timeRange) => {
+  const handleCreateTask = (taskData) => {
     const newTask = {
+      ...taskData,
       id: Date.now(),
-      content: '新任务',
       date: format(currentDate, 'yyyy-MM-dd'),
-      ...timeRange,
-      quadrant: 'important-urgent'
+      isCompleted: false,
     };
-    
-    setTasks([...tasks, newTask]);
-    return newTask; // 返回新任务用于打开编辑器
+    setTasks((prev) => [...prev, newTask]);
   };
 
-  // 更新任务
   const handleUpdateTask = (updatedTask) => {
-    setTasks(tasks.map(task => 
-      task.id === updatedTask.id ? updatedTask : task
-    ));
+    setTasks((prev) =>
+      prev.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+    );
   };
 
-  // 移动任务到不同象限 - 修复：正确更新状态
   const handleTaskMove = (taskId, newQuadrant) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? {...task, quadrant: newQuadrant} : task
-    ));
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, quadrant: newQuadrant } : t))
+    );
   };
 
-  // 删除任务
   const handleDeleteTask = (taskId) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
   };
 
-  // 获取当前日期的任务
+  const handleToggleTaskCompletion = (taskId) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId ? { ...t, isCompleted: !t.isCompleted } : t
+      )
+    );
+  };
+
   const getCurrentDateTasks = () => {
     const dateStr = format(currentDate, 'yyyy-MM-dd');
-    return tasks.filter(task => task.date === dateStr);
+    return tasks.filter((t) => t.date === dateStr);
   };
 
   return (
     <div className="App">
       <h1>时间管理应用</h1>
-      
       {showTaskView ? (
-        <DndProvider backend={HTML5Backend}>
-          <TaskManagement 
-            date={currentDate} 
-            tasks={getCurrentDateTasks()}
-            allTasks={tasks}
-            onCreateTask={handleCreateTask}
-            onUpdateTask={handleUpdateTask}
-            onTaskMove={handleTaskMove}
-            onDeleteTask={handleDeleteTask}
-            onBack={() => setShowTaskView(false)}
-          />
-        </DndProvider>
+        <TaskManagement
+          date={currentDate}
+          tasks={getCurrentDateTasks()}
+          allTasks={tasks}
+          onCreateTask={handleCreateTask}
+          onUpdateTask={handleUpdateTask}
+          onTaskMove={handleTaskMove}
+          onDeleteTask={handleDeleteTask}
+          onToggleComplete={handleToggleTaskCompletion}
+          onBack={() => setShowTaskView(false)}
+        />
       ) : (
-        <CalendarView 
-          currentDate={currentDate} 
+        <CalendarView
+          currentDate={currentDate}
           tasks={tasks}
-          onDateChange={handleDateClick}
-          onDoubleClick={handleDoubleClick}
+          onDateInteraction={handleDateInteraction}
         />
       )}
     </div>
