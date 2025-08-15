@@ -1,31 +1,31 @@
-
 import React from 'react';
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
+import 'react-calendar/dist/Calendar.css';
 
-// Calendar component
 export default function CalendarView({ currentDate, tasks, onDateInteraction }) {
-  const taskDates = new Set(tasks.map(task => task.date));
-  
+
   const tileContent = ({ date, view }) => {
     if (view !== 'month') return null;
+
     const dateStr = format(date, 'yyyy-MM-dd');
-    const hasTask = taskDates.has(dateStr);
-    return hasTask ? <div className="task-dot" /> : null;
+    const tasksForDay = tasks.filter(task => format(task.startTime, 'yyyy-MM-dd') === dateStr);
+
+    if (tasksForDay.length === 0) {
+      return null;
+    }
+
+    const allTasksCompleted = tasksForDay.every(task => task.isCompleted);
+
+    return <div className={`task-dot ${allTasksCompleted ? 'green' : 'red'}`} />;
   };
 
   return (
-    <div className="calendar-container">
-      <Calendar 
+    <div className="calendar-view">
+      <Calendar
         value={currentDate}
-        onClickDay={onDateInteraction}  // Triggering the passed function when a day is clicked
+        onChange={onDateInteraction}
         tileContent={tileContent}
-        tileClassName={({ date, view }) => 
-          view === 'month' && date.toDateString() === new Date().toDateString() 
-            ? 'highlight' 
-            : ''
-        }
       />
     </div>
   );

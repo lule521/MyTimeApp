@@ -1,6 +1,6 @@
-// src/components/QuadrantGrid.js
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { format } from 'date-fns';
 
 const QUADRANTS = [
   { id: 'important-urgent', title: '重要 & 紧急' },
@@ -30,7 +30,6 @@ function QuadrantColumn({ quadrant, tasks, onTaskMove, onTaskClick, onToggleComp
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: 'TASK',
     drop: (item) => {
-      // 确保 item.id 存在且象限不同时才移动
       if (item.id && item.quadrant !== quadrant.id) {
         onTaskMove(item.id, quadrant.id);
       }
@@ -76,17 +75,14 @@ function TaskCard({ task, onClick, onToggleComplete }) {
         <input
           type="checkbox"
           checked={!!task.isCompleted}
-          onClick={(e) => {
-            e.stopPropagation(); // 防止触发 onClick 打开编辑器
-            onToggleComplete && onToggleComplete(task.id);
-          }}
+          onClick={(e) => { e.stopPropagation(); onToggleComplete && onToggleComplete(task.id); }}
           readOnly
           style={{ marginRight: '8px' }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="title">{task.content}</div>
           <div className="meta">
-            {task.startHour}:00 - {task.startHour + task.duration}:00
+            {format(task.startTime, 'HH:mm')} - {format(task.endTime, 'HH:mm')}
           </div>
         </div>
     </div>

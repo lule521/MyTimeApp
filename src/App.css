@@ -13,6 +13,28 @@ body, html, #root {
   padding: 0 24px;
 }
 
+/* 主应用头部 */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #dee2e6;
+}
+.main-header button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.main-header button:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+}
+
 /* 顶部工具栏 */
 .toolbar {
   display: flex;
@@ -26,13 +48,13 @@ body, html, #root {
   padding: 8px 16px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  background-color: #fff;
+  background-color: #18bdfe;
   cursor: pointer;
   transition: background-color 0.2s, box-shadow 0.2s;
 }
 .toolbar button:hover {
-  background-color: #f8f9fa;
-  border-color: #adb5bd;
+  background-color: #2bff00;
+  border-color: #ffffff;
 }
 
 /* 主布局：左右分栏 */
@@ -77,8 +99,12 @@ body, html, #root {
 }
 
 /* 选中（拖选）高亮 */
-.hour-block.selecting {
+.selection-highlight {
   background: rgba(13, 110, 253, 0.1);
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 5;
 }
 
 /* 任务块在时间轴的显示 */
@@ -120,7 +146,6 @@ body, html, #root {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 20px;
-  height: 400px;
 }
 
 /* 单个象限卡片 */
@@ -186,8 +211,8 @@ body, html, #root {
 .create-task-btn {
   position: absolute;
   padding: 8px 12px;
-  background: #28a745;
-  color: #fff;
+  background: #09eb3e;
+  color: #2fce29;
   border: none;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -199,4 +224,26 @@ body, html, #root {
 }
 .create-task-btn:hover {
     transform: scale(1.05) translateX(10px);
+}
+
+/* 日历提醒点 */
+.react-calendar__tile {
+  position: relative;
+}
+.task-dot {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.task-dot.green {
+  background-color: #28a745;
+}
+
+.task-dot.red {
+  background-color: #dc3545;
 }
