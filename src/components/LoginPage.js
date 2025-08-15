@@ -55,6 +55,7 @@ const LoginPage = () => {
             type="submit"
             fullWidth
             variant="contained"
+            className="btn-login"
             sx={{ mt: 3, mb: 2 }}
           >
             登录

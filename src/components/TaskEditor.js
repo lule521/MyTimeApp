@@ -84,12 +84,12 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel }) {
         </DialogContent>
         <DialogActions>
           {task.id && (
-            <Button onClick={() => onDelete(task.id)} color="error">
+            <Button className="btn-delete" onClick={() => onDelete(task.id)} color="error">
               删除
             </Button>
           )}
-          <Button onClick={onCancel}>取消</Button>
-          <Button onClick={handleSubmit} color="primary" variant="contained">
+          <Button className="btn-cancel" onClick={onCancel}>取消</Button>
+          <Button className="btn-save" onClick={handleSubmit} color="primary" variant="contained">
             保存
           </Button>
         </DialogActions>

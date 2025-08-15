@@ -41,7 +41,7 @@ function QuadrantColumn({ quadrant, tasks, onTaskMove, onTaskClick, onToggleComp
   }), [quadrant.id, onTaskMove]);
 
   return (
-    <div ref={drop} className={`quadrant ${isOver && canDrop ? 'accepting-drop' : ''}`}>
+    <div ref={drop} className={`quadrant ${quadrant.id} ${isOver && canDrop ? 'accepting-drop' : ''}`}>
       <h4>{quadrant.title}</h4>
       <div className="tasks-container">
         {tasks.map((task) => (
@@ -69,7 +69,7 @@ function TaskCard({ task, onClick, onToggleComplete }) {
   return (
     <div
       ref={drag}
-      className={taskItemClasses}
+      className={`task-item ${task.quadrant} ${task.isCompleted ? 'completed' : ''} ${isDragging ? 'dragging' : ''}`}
       onClick={() => onClick && onClick(task)}
     >
         <input

@@ -49,9 +49,9 @@ export default function TaskManagement({
   return (
     <div className="task-management">
       <div className="toolbar">
-        <Button onClick={onBack}>返回日历</Button>
+        <Button className="btn-back" onClick={onBack}>返回日历</Button>
         <h3>{format(date, 'yyyy-MM-dd')}</h3>
-        <Button variant="contained" onClick={() => handleOpenEditor({})}>+ 创建新任务</Button>
+        <Button className="btn-create" variant="contained" onClick={() => handleOpenEditor({})}>+ 创建新任务</Button>
       </div>
 
       <div className="task-layout">

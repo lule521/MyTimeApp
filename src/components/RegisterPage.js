@@ -59,6 +59,7 @@ const RegisterPage = () => {
             type="submit"
             fullWidth
             variant="contained"
+            className="btn-register"
             sx={{ mt: 3, mb: 2 }}
           >
             注册

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { format, getMinutes, getHours, differenceInMinutes, startOfDay, addMinutes, isBefore } from 'date-fns';
 
+
 const MINUTE_HEIGHT = 1;
 const HOUR_HEIGHT = 60 * MINUTE_HEIGHT;
 
@@ -122,7 +123,7 @@ export default function TimeAxis({ tasks = [], onCreateRange, onTaskClick, onTog
 
       {showCreateButton.show && (
         <button
-          className="create-task-btn"
+          className="create-task-btn btn-timeaxis-create"
           style={{
             position: 'absolute',
             top: `${showCreateButton.top}px`,

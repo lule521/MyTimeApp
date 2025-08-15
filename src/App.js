@@ -129,7 +129,7 @@ function App() {
     <div className="App">
       <div className="main-header">
         <h1>时间管理应用</h1>
-        <button onClick={handleLogout}>退出登录</button>
+        <button className="btn-logout" onClick={handleLogout}>退出登录</button>
       </div>
       {showTaskView ? (
         <TaskManagement
@@ -154,6 +154,7 @@ function App() {
       )}
     </div>
   );
+
 
   if (loading) {
     return <div className="loading-screen">加载中...</div>;
